@@ -1,7 +1,8 @@
 const express = require('express');
 const morgan = require('morgan');
+const errorHandler = require('./controllers/error-controller');
+
 const app = express();
-const errorHandler = require('./controllers/errorController');
 
 if (process.env.NODE_ENV === 'development') app.use(morgan('dev'));
 

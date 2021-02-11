@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "dev": "nodemon server.js",
-    "prod": "SET NODE_ENV=production & nodemon server.js",
+    "prod": "set NODE_ENV=production&&nodemon server.js",
     "debug": "ndb server.js"
   },
   "author": "Ícaro Motta",

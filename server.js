@@ -1,26 +1,29 @@
-const mongoose = require('mongoose');
+const {connect} = require('mongoose');
 const env = require('dotenv');
 
-env.config({ path: './config.env' });
+//Treating uncaught exceptions which occur in synchronous code
+process.on('uncaughtException', err => {
+	console.error(`${err.name}\nError: ${err.message}`);
+	process.exit(1);
+});
 
+env.config({path: './config.env'});
 const app = require('./app');
 
-const DB = process.env.DATABASE;
+connect(process.env.DATABASE, {
+	useNewUrlParser: true,
+	useUnifiedTopology: true,
+	useCreateIndex: true,
+	useFindAndModify: false,
+}).then(() => console.log('Connected to database'));
 
-(async () => {
-	try {
-		await mongoose.connect(DB, {
-			useNewUrlParser: true,
-			useUnifiedTopology: true,
-			useCreateIndex: true,
-			useFindAndModify: false
-		});
+const port = process.env.PORT || 3000;
+const server = app.listen(port, () => {
+	console.log(`App running on port ${port}`);
+});
 
-		const port = process.env.PORT || 3000;
-		app.listen(port, () => {
-			console.log(`App rodando na porta ${port}`);
-		});
-	} catch (err) {
-		console.log(err.message);
-	}
-})();
+//Treating unhandled rejections which occur inside async functions
+process.on('unhandledRejection', err => {
+	console.error(`${err.name}\nError: ${err.message}`);
+	server.close(() => process.exit(1));
+});
