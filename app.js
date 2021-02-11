@@ -17,8 +17,8 @@ const tourRouter = require('./routes/tour-routes');
 const userRouter = require('./routes/user-routes');
 const AppError = require('./Utils/AppError');
 
-app.use('/api/v1/tours', tourRouter);
-app.use('/api/v1/users', userRouter);
+app.use('/api/tours', tourRouter);
+app.use('/api/users', userRouter);
 
 app.all('*', (req, res, next) => {
 	next(new AppError(`Couldn't find ${req.originalUrl} in this server`, 404));

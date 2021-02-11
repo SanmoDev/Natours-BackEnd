@@ -1,25 +1,9 @@
-const fs = require('fs');
+const User = require('../models/user-model');
+const globalCatch = require('../Utils/GlobalCatch');
 
-const users = JSON.parse(
-	fs.readFileSync(`${__dirname}/../dev-data/data/users.json`)
-);
+exports.getAllUsers = globalCatch(async (req, res, next) => {
+	const users = await User.find();
 
-exports.checkID = (req, res, next, val) => {
-	const id = parseInt(10, val);
-	const user = users.find((el) => el.id === id);
-	if (!user) {
-		res.status(404).json({
-			status: 'failed',
-			requestedAt: req.requestTime,
-			message: `Não há user de ID ${id}`,
-		});
-		return;
-	}
-	req.user = user;
-	next();
-};
-
-exports.getAllUsers = (req, res) => {
 	res.status(200).json({
 		status: 'success',
 		requestedAt: req.requestTime,
@@ -28,52 +12,48 @@ exports.getAllUsers = (req, res) => {
 			users,
 		},
 	});
-};
+});
 
-exports.getUser = ({ user, requestedTime }, res) => {
-	res.status(200).json({
-		status: 'success',
-		requestedAt: requestedTime,
-		data: {
-			user,
-		},
-	});
-};
-
-exports.addUser = ({ body, requestTime }, res) => {
-	const newUser = {
-		id: users[users.length - 1].id + 1,
-		...body,
-	};
-	users.push(newUser);
-
-	fs.writeFile(
-		`${__dirname}/dev-data/data/users.json`,
-		JSON.stringify(users),
-		() => {
-			res.status(201).json({
-				status: 'success',
-				requestedAt: requestTime,
-				data: { user: newUser },
-			});
-		}
-	);
-};
-
-exports.updateUser = ({ user, requestTime }, res) => {
-	res.status(200).json({
-		status: 'success',
-		requestedAt: requestTime,
-		data: {
-			user: `User de ID ${user.id} atualizado`,
-		},
-	});
-};
-
-exports.deleteUser = ({ requestTime }, res) => {
-	res.status(204).json({
-		status: 'success',
-		requestedAt: requestTime,
-		data: null,
-	});
-};
+// exports.getUser = ({user, requestedTime}, res) => {
+// 	res.status(200).json({
+// 		status: 'success',
+// 		requestedAt: requestedTime,
+// 		data: {
+// 			user,
+// 		},
+// 	});
+// };
+//
+// exports.createUser = ({body, requestTime}, res) => {
+// 	const newUser = {
+// 		id: users[users.length - 1].id + 1,
+// 		...body,
+// 	};
+// 	users.push(newUser);
+//
+// 	fs.writeFile(`${__dirname}/dev-data/data/users.json`, JSON.stringify(users), () => {
+// 		res.status(201).json({
+// 			status: 'success',
+// 			requestedAt: requestTime,
+// 			data: {user: newUser},
+// 		});
+// 	});
+// };
+//
+// exports.updateUser = ({user, requestTime}, res) => {
+// 	res.status(200).json({
+// 		status: 'success',
+// 		requestedAt: requestTime,
+// 		data: {
+// 			user: `User de ID ${user.id} atualizado`,
+// 		},
+// 	});
+// };
+//
+// exports.deleteUser = ({requestTime}, res) => {
+// 	res.status(204).json({
+// 		status: 'success',
+// 		requestedAt: requestTime,
+// 		data: null,
+// 	});
+// };
