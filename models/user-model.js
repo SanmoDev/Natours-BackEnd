@@ -15,6 +15,11 @@ const userSchema = new mongoose.Schema({
 		validate: [validator.isEmail, 'Please provide a valid email'],
 	},
 	photo: String,
+	role: {
+		type: String,
+		enum: ['user', 'guide', 'lead-guide', 'admin'],
+		default: 'user',
+	},
 	password: {
 		type: String,
 		required: [true, 'A user must have a password'],
@@ -32,6 +37,7 @@ const userSchema = new mongoose.Schema({
 			message: 'Please input the same password in the confirmation field',
 		},
 	},
+	passwordChangedAt: Date,
 });
 
 //ENCRYPTING PASSWORD
@@ -45,6 +51,18 @@ userSchema.pre('save', async function (next) {
 
 userSchema.methods.correctPassword = (candidPW, userPW) =>
 	bcrypt.compare(candidPW, userPW);
+
+userSchema.methods.passwordChanged = function (TokenIssueTime) {
+	if (this.passwordChangedAt) {
+		const changedTimeStamp = parseInt(
+			this.passwordChangedAt.getTime() / 1000,
+			10
+		);
+		return TokenIssueTime < changedTimeStamp;
+	}
+
+	return false;
+};
 
 const User = mongoose.model('User', userSchema);
 module.exports = User;

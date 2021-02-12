@@ -43,6 +43,12 @@ const handleDuplicateError = err => {
 	);
 };
 
+const handleInvalidJWT = () =>
+	new AppError('Invalid access request, please login again', 401);
+
+const handleExpiredJWT = () =>
+	new AppError('Your session has expired, please login again', 401);
+
 module.exports = (err, req, res, next) => {
 	err.statusCode = err.statusCode || 500;
 	err.status = err.status || 'Unknown error occurred';
@@ -50,10 +56,25 @@ module.exports = (err, req, res, next) => {
 	if (process.env.NODE_ENV === 'development') sendErrorDev(err, res);
 
 	if (process.env.NODE_ENV === 'production') {
-		if (err.name === 'CastError') err = handleCastError(err);
-		else if (err.name === 'ValidationError') err = handleValidationError(err);
-		else if (err.code === 11000) err = handleDuplicateError(err);
-
+		if (err.code === 11000) err = handleDuplicateError(err);
+		else {
+			switch (err.name) {
+				case 'CastError':
+					err = handleCastError(err);
+					break;
+				case 'ValidationError':
+					err = handleValidationError(err);
+					break;
+				case 'JsonWebTokenError':
+					err = handleInvalidJWT();
+					break;
+				case 'TokenExpiredError':
+					err = handleExpiredJWT();
+					break;
+				default:
+					break;
+			}
+		}
 		sendErrorProd(err, res);
 	}
 };
