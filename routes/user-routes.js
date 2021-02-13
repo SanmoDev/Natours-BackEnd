@@ -9,8 +9,10 @@ router
 	//.post('/', userCon.createUser)
 	.post('/signup', authCon.signup)
 	.post('/login', authCon.login)
-	//.get('/:id', userCon.getUser)
-	//.patch('/:id', userCon.updateUser)
-	//.delete('/:id', userCon.deleteUser);
+	.post('/forgotPassword', authCon.forgotPass)
+	.patch('/resetPassword/:token', authCon.resetPass);
+//.get('/:id', userCon.getUser)
+//.patch('/:id', userCon.updateUser)
+//.delete('/:id', userCon.deleteUser);
 
 module.exports = router;

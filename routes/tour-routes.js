@@ -6,29 +6,14 @@ const authCon = require('../controllers/auth-controller');
 const router = express.Router();
 
 router
-	.get('/', tourCon.getAllTours)
-	.post('/', authCon.protect, authCon.restrictTo('admin'), tourCon.addTour)
+	.get('/', authCon.protect, tourCon.getAllTours)
+	.post('/', tourCon.addTour)
 	.get('/top-tours', tourCon.topTours, tourCon.getAllTours)
-	.get(
-		'/tour-stats',
-		authCon.protect,
-		authCon.restrictTo('admin'),
-		tourCon.getTourStats
-	)
+	.get('/tour-stats', tourCon.getTourStats)
 	.get('/monthly-plan/:year', tourCon.getMonthlyPlan)
 	.get('/:id', tourCon.getTour)
-	.patch(
-		'/:id',
-		authCon.protect,
-		authCon.restrictTo('admin'),
-		tourCon.updateTour
-	)
-	.delete(
-		'/:id',
-		authCon.protect,
-		authCon.restrictTo('admin'),
-		tourCon.deleteTour
-	);
+	.patch('/:id', tourCon.updateTour)
+	.delete('/:id', tourCon.deleteTour);
 //rotas com :id tem que estar em baixo
 
 module.exports = router;

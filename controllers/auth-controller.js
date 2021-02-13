@@ -1,8 +1,10 @@
 const jwt = require('jsonwebtoken');
 const {promisify} = require('util');
+const crypto = require('crypto');
 const User = require('../models/user-model');
 const globalCatch = require('../Utils/GlobalCatch');
 const AppError = require('../Utils/AppError');
+const sendEmail = require('../Utils/Email');
 
 const signToken = id =>
 	jwt.sign({id}, process.env.JWT_SECRET, {
@@ -77,3 +79,71 @@ exports.restrictTo = (...roles) => (req, res, next) => {
 		);
 	next();
 };
+
+exports.forgotPass = globalCatch(async (req, res, next) => {
+	//GET USER FROM EMAIL
+	const user = await User.findOne({email: req.body.email});
+	if (!user) return next(new AppError('No user found with that email', 404));
+	//GENERATE RANDOM RESET TOKEN
+	const resetToken = user.createPwResetToken();
+	await user.save({validateBeforeSave: false});
+	//SEND TOKEN TO USER EMAIL
+	const resetURL = `${req.protocol}://${req.get(
+		'host'
+	)}/api/users/resetPassword/${resetToken}`;
+
+	const message = `Forgot your password? Click this link below\n${resetURL}\nIf you didn't, please ignore this email`;
+
+	try {
+		await sendEmail({
+			email: user.email,
+			subject: 'Your password reset Token (valid for 10min)',
+			message,
+		});
+
+		res.status(200).json({
+			status: 'success',
+			message: 'Token sent to email!',
+		});
+	} catch (err) {
+		user.passwordResetToken = undefined;
+		user.passwordResetExpires = undefined;
+		await user.save({validateBeforeSave: false});
+
+		return next(
+			new AppError(
+				'There was an error sending the email, please try again later',
+				500
+			)
+		);
+	}
+});
+
+exports.resetPass = globalCatch(async (req, res, next) => {
+	//GET USER FROM TOKEN
+	const hashedToken = crypto
+		.createHash('sha256')
+		.update(req.params.token)
+		.digest('hex');
+
+	const user = await User.findOne({
+		passwordResetToken: hashedToken,
+		passwordResetExpires: {$gt: Date.now()},
+	});
+	//IF TOKEN HASN'T EXPIRED AND USER IS VALID, SET NEW PW
+	if (!user) return next(new AppError('Token is invalid or has expired', 400));
+	user.password = req.body.password;
+	user.passwordConfirm = req.body.passwordConfirm;
+	user.passwordResetToken = undefined;
+	user.passwordResetExpires = undefined;
+	//UPDATE ChangedPasswordAt
+	//user.passwordChangedAt = Date.now();
+	await user.save();
+	//LOG USER IN, SEND JWT
+	const token = signToken(user._id);
+
+	res.status(200).json({
+		status: 'success',
+		token,
+	});
+});
