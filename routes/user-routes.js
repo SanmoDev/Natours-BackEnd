@@ -10,9 +10,11 @@ router
 	.post('/signup', authCon.signup)
 	.post('/login', authCon.login)
 	.post('/forgotPassword', authCon.forgotPass)
-	.patch('/resetPassword/:token', authCon.resetPass);
+	.patch('/resetPassword/:token', authCon.resetPass)
+	.patch('/updatePassword', authCon.protect, authCon.updatePassword)
+	.patch('/updateMyAccount', authCon.protect, userCon.updateSelf);
 //.get('/:id', userCon.getUser)
-//.patch('/:id', userCon.updateUser)
+//.patch('/:id', userCon.updateUser);
 //.delete('/:id', userCon.deleteUser);
 
 module.exports = router;

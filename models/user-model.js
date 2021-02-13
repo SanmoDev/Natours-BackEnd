@@ -60,9 +60,11 @@ userSchema.pre('save', async function (next) {
 	next();
 });
 
+//CHECK PASSWORD
 userSchema.methods.correctPassword = (candidPW, userPW) =>
 	bcrypt.compare(candidPW, userPW);
 
+//CHECK IF PASSWORD HAS CHANGED AFTER TOKEN WAS ISSUED
 userSchema.methods.passwordChanged = function (TokenIssueTime) {
 	if (this.passwordChangedAt) {
 		const changedTimeStamp = parseInt(
@@ -74,6 +76,7 @@ userSchema.methods.passwordChanged = function (TokenIssueTime) {
 	return false;
 };
 
+//RESET PASSWORD
 userSchema.methods.createPwResetToken = function () {
 	const resetToken = crypto.randomBytes(32).toString('hex');
 	this.passwordResetToken = crypto
