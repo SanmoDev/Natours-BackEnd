@@ -12,7 +12,7 @@ const filterObj = (obj, ...allowed) => {
 };
 
 exports.getAllUsers = globalCatch(async (req, res, next) => {
-	const users = await User.find();
+	const users = await User.find().select('-__v');
 
 	res.status(200).json({
 		status: 'success',
@@ -44,6 +44,15 @@ exports.updateSelf = globalCatch(async (req, res, next) => {
 	res.status(200).json({
 		status: 'success',
 		data: {user},
+	});
+});
+
+exports.deleteSelf = globalCatch(async (req, res, next) => {
+	await User.findByIdAndUpdate(req.user.id, {active: false});
+
+	res.status(204).json({
+		status: 'success',
+		data: null,
 	});
 });
 

@@ -6,7 +6,7 @@ const authCon = require('../controllers/auth-controller');
 const router = express.Router();
 
 router
-	.get('/', authCon.protect, tourCon.getAllTours)
+	.get('/', tourCon.getAllTours)
 	.post('/', tourCon.addTour)
 	.get('/top-tours', tourCon.topTours, tourCon.getAllTours)
 	.get('/tour-stats', tourCon.getTourStats)

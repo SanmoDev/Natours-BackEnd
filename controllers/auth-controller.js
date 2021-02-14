@@ -24,8 +24,74 @@ const createSendToken = (user, statusCode, res) => {
 };
 
 exports.signup = globalCatch(async (req, res, next) => {
-	const newUser = await User.create(req.body);
-	createSendToken(newUser, 201, res);
+	const user = await User.create({
+		name: req.body.name,
+		email: req.body.email,
+		password: req.body.password,
+		passwordConfirm: req.body.passwordConfirm,
+	});
+	//SEND CONFIRM TOKEN TO USER EMAIL
+	const confirmToken = user.createEmailConfirmToken();
+	await user.save({validateBeforeSave: false});
+
+	const URL = `${req.protocol}://${req.get(
+		'host'
+	)}/api/users/confirmEmail/${confirmToken}`;
+
+	const message = `Did you just create an account at Natours.com? Click the link below to confirm your email\n${URL}\nIf you didn't, please ignore this email`;
+
+	try {
+		await sendEmail({
+			email: user.email,
+			subject: 'Natours email confirmation token (valid for 10min)',
+			message,
+		});
+
+		res.status(201).json({
+			status: 'success',
+			message: 'User created successfully, please confirm your email',
+		});
+	} catch (err) {
+		user.emailConfirmToken = undefined;
+		user.emailConfirmExpires = undefined;
+		await user.save({validateBeforeSave: false});
+
+		return next(
+			new AppError(
+				'There was an error sending the confirmation email, please try again later',
+				500
+			)
+		);
+	}
+});
+
+exports.confirmEmail = globalCatch(async (req, res, next) => {
+	//GET USER FROM TOKEN
+	const hashedToken = crypto
+		.createHash('sha256')
+		.update(req.params.token)
+		.digest('hex');
+
+	const user = await User.findOne({
+		emailConfirmToken: hashedToken,
+	});
+	//IF TOKEN HASN'T EXPIRED AND USER IS VALID, SET NEW PW
+	if (!user)
+		return next(
+			new AppError('Confirmation token is invalid or has expired', 400)
+		);
+
+	user.active = true;
+	user.emailConfirmToken = undefined;
+	user.emailConfirmExpires = undefined;
+	await user.save({validateBeforeSave: false});
+	//LOG USER IN
+	const token = signToken(user._id);
+
+	res.status(200).json({
+		status: 'success',
+		token,
+	});
 });
 
 exports.login = globalCatch(async (req, res, next) => {
@@ -60,7 +126,7 @@ exports.protect = globalCatch(async (req, res, next) => {
 	//CHECK IF USER HAS CHANGED PASSWORD AFTER TOKEN WAS ISSUED
 	if (user.passwordChanged(decoded.iat))
 		return next(
-			new AppError('This password has been changed, please login again', 401)
+			new AppError('This user\'s password has been changed, please login again', 401)
 		);
 
 	req.user = user;
@@ -75,7 +141,7 @@ exports.restrictTo = (...roles) => (req, res, next) => {
 	next();
 };
 
-exports.forgotPass = globalCatch(async (req, res, next) => {
+exports.forgotPassword = globalCatch(async (req, res, next) => {
 	//GET USER FROM EMAIL
 	const user = await User.findOne({email: req.body.email});
 	if (!user) return next(new AppError('No user found with that email', 404));
@@ -87,7 +153,7 @@ exports.forgotPass = globalCatch(async (req, res, next) => {
 		'host'
 	)}/api/users/resetPassword/${resetToken}`;
 
-	const message = `Forgot your password? Click this link below\n${resetURL}\nIf you didn't, please ignore this email`;
+	const message = `Forgot your password? Click the link below to reset it\n${resetURL}\nIf you didn't, please ignore this email`;
 
 	try {
 		await sendEmail({
@@ -114,7 +180,7 @@ exports.forgotPass = globalCatch(async (req, res, next) => {
 	}
 });
 
-exports.resetPass = globalCatch(async (req, res, next) => {
+exports.resetPassword = globalCatch(async (req, res, next) => {
 	//GET USER FROM TOKEN
 	const hashedToken = crypto
 		.createHash('sha256')
@@ -126,7 +192,10 @@ exports.resetPass = globalCatch(async (req, res, next) => {
 		passwordResetExpires: {$gt: Date.now()},
 	});
 	//IF TOKEN HASN'T EXPIRED AND USER IS VALID, SET NEW PW
-	if (!user) return next(new AppError('Token is invalid or has expired', 400));
+	if (!user)
+		return next(
+			new AppError('Confirmation token is invalid or has expired', 400)
+		);
 	user.password = req.body.password;
 	user.passwordConfirm = req.body.passwordConfirm;
 	user.passwordResetToken = undefined;

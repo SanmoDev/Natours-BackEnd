@@ -38,9 +38,27 @@ const userSchema = new mongoose.Schema({
 			message: 'Please input the same password in the confirmation field',
 		},
 	},
-	passwordChangedAt: Date,
-	passwordResetToken: String,
-	passwordResetExpires: Date,
+	passwordChangedAt: {
+		type: Date,
+		select: false,
+	},
+	passwordResetToken: {
+		type: String,
+		select: false,
+	},
+	passwordResetExpires: {
+		type: Date,
+		select: false,
+	},
+	emailConfirmToken: {
+		type: String,
+		select: false,
+	},
+	active: {
+		type: Boolean,
+		default: false,
+		select: false,
+	},
 });
 
 //UPDATING passwordChangedAt
@@ -60,6 +78,12 @@ userSchema.pre('save', async function (next) {
 	next();
 });
 
+//GET ONLY ACTIVE ACCOUNTS IN THE GET ALL FUNCTION
+userSchema.pre('find', function (next) {
+	this.find({active: {$ne: false}});
+	next();
+});
+
 //CHECK PASSWORD
 userSchema.methods.correctPassword = (candidPW, userPW) =>
 	bcrypt.compare(candidPW, userPW);
@@ -76,7 +100,7 @@ userSchema.methods.passwordChanged = function (TokenIssueTime) {
 	return false;
 };
 
-//RESET PASSWORD
+//CREATE TOKEN FOR RESETTING THE PASSWORD
 userSchema.methods.createPwResetToken = function () {
 	const resetToken = crypto.randomBytes(32).toString('hex');
 	this.passwordResetToken = crypto
@@ -89,6 +113,18 @@ userSchema.methods.createPwResetToken = function () {
 	//console.log({resetToken}, this.passwordResetToken);
 
 	return resetToken;
+};
+
+//CREATE TOKEN TO CONFIRM EMAIL
+userSchema.methods.createEmailConfirmToken = function () {
+	const confirmToken = crypto.randomBytes(32).toString('hex');
+	this.emailConfirmToken = crypto
+		.createHash('sha256')
+		.update(confirmToken)
+		.digest('hex');
+	//console.log({confirmToken}, this.emailConfirmToken);
+
+	return confirmToken;
 };
 
 const User = mongoose.model('User', userSchema);
