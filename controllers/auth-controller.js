@@ -14,6 +14,19 @@ const signToken = id =>
 const createSendToken = (user, statusCode, res) => {
 	const token = signToken(user._id);
 
+	const cookieOptions = {
+		expires: new Date(
+			Date.now() +
+				parseInt(process.env.JWT_COOKIE_EXPIRE, 10) * 24 * 60 * 60 * 1000
+		),
+		secure: process.env.NODE_ENV === 'production',
+		httpOnly: true,
+	};
+
+	res.cookie('jwt', token, cookieOptions);
+
+	user.password = user.active = user.role = user.__v = undefined;
+
 	res.status(statusCode).json({
 		status: 'success',
 		token,
@@ -86,12 +99,7 @@ exports.confirmEmail = globalCatch(async (req, res, next) => {
 	user.emailConfirmExpires = undefined;
 	await user.save({validateBeforeSave: false});
 	//LOG USER IN
-	const token = signToken(user._id);
-
-	res.status(200).json({
-		status: 'success',
-		token,
-	});
+	createSendToken(user, 200, res);
 });
 
 exports.login = globalCatch(async (req, res, next) => {
@@ -126,7 +134,10 @@ exports.protect = globalCatch(async (req, res, next) => {
 	//CHECK IF USER HAS CHANGED PASSWORD AFTER TOKEN WAS ISSUED
 	if (user.passwordChanged(decoded.iat))
 		return next(
-			new AppError('This user\'s password has been changed, please login again', 401)
+			new AppError(
+				"This user's password has been changed, please login again",
+				401
+			)
 		);
 
 	req.user = user;
