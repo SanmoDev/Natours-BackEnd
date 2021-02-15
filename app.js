@@ -5,12 +5,16 @@ const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
+const cors = require('cors');
 const errorHandler = require('./controllers/error-controller');
 
 const app = express();
 
 //SET SECURITY HTTP HEADERS
 app.use(helmet());
+
+//SET UP CORS
+app.use(cors());
 
 //DEV LOGGING
 if (process.env.NODE_ENV === 'development') app.use(morgan('dev'));
