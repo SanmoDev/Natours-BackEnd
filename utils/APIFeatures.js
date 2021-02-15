@@ -4,6 +4,7 @@ class APIFeatures {
 		this.queryString = queryString;
 	}
 
+	//REMOVES FUNCTION PARAMETERS FROM THE QUERY, PUT ANY PARAMS YOU'LL USE ON FUNCTIONS HERE
 	filter() {
 		const newQuery = {...this.queryString};
 		['page', 'sort', 'limit', 'fields', 'search'].forEach(el => {
