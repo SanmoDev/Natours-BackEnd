@@ -1,7 +1,7 @@
 const Tour = require('../models/tour-model');
-const APIFeatures = require('../Utils/APIFeatures');
-const globalCatch = require('../Utils/GlobalCatch');
-const AppError = require('../Utils/AppError');
+const APIFeatures = require('../utils/APIFeatures');
+const globalCatch = require('../utils/GlobalCatch');
+const AppError = require('../utils/AppError');
 
 exports.topTours = globalCatch(async (req, res, next) => {
 	req.query.limit = '5';
@@ -13,6 +13,7 @@ exports.topTours = globalCatch(async (req, res, next) => {
 exports.getAllTours = globalCatch(async (req, res, next) => {
 	const features = new APIFeatures(Tour.find(), req.query)
 		.filter()
+		.search()
 		.sort()
 		.limitFields()
 		.paginate();

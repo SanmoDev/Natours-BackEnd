@@ -6,10 +6,18 @@ class APIFeatures {
 
 	filter() {
 		const newQuery = {...this.queryString};
-		['page', 'sort', 'limit', 'fields'].forEach(el => {
+		['page', 'sort', 'limit', 'fields', 'search'].forEach(el => {
 			delete newQuery[el];
 		});
 		this.query = this.query.find(newQuery);
+		return this;
+	}
+
+	search() {
+		if (this.queryString.search)
+			this.query = this.query.find({
+				name: {$regex: this.queryString.search, $options: 'ig'},
+			});
 		return this;
 	}
 
@@ -17,6 +25,7 @@ class APIFeatures {
 		if (this.queryString.sort)
 			this.query = this.query.sort(this.queryString.sort.split(',').join(' '));
 		else this.query = this.query.sort('-createdAt');
+
 		return this;
 	}
 

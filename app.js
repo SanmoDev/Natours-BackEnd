@@ -62,7 +62,7 @@ app.use((req, res, next) => {
 
 const tourRouter = require('./routes/tour-routes');
 const userRouter = require('./routes/user-routes');
-const AppError = require('./Utils/AppError');
+const AppError = require('./utils/AppError');
 
 app.use('/api/tours', tourRouter);
 app.use('/api/users', userRouter);
