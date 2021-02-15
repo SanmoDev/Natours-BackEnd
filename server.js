@@ -3,7 +3,8 @@ const env = require('dotenv');
 
 //Treating uncaught exceptions which occur in synchronous code
 process.on('uncaughtException', err => {
-	console.error(`${err.name}\nError: ${err.message}`);
+	console.error(`Error type: ${err.name}\nError message: ${err.message}\n
+	Complete error: ${err.stack}`);
 	process.exit(1);
 });
 
@@ -24,6 +25,7 @@ const server = app.listen(port, () => {
 
 //Treating unhandled rejections which occur inside async functions
 process.on('unhandledRejection', err => {
-	console.error(`${err.name}\nError: ${err.message}`);
+	console.error(`Error type: ${err.name}\nError message: ${err.message}\n
+	Complete error: ${err.stack}`);
 	server.close(() => process.exit(1));
 });
