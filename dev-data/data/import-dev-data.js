@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const env = require('dotenv');
 const Tour = require('../../models/tour-model');
 
-env.config({ path: './config.env' });
+env.config({path: './config.env'});
 
 const DB = process.env.DATABASE.replace('PASSWORD', process.env.PASSWORD);
 
@@ -17,9 +17,7 @@ mongoose
 		console.log('Conexão feita com sucesso!');
 	});
 
-const tours = JSON.parse(
-	fs.readFileSync(`${__dirname}/tours-simple.json`, 'utf-8')
-);
+const tours = JSON.parse(fs.readFileSync(`${__dirname}/tours.json`, 'utf-8'));
 
 const importData = async () => {
 	try {
@@ -49,5 +47,7 @@ switch (process.argv[2]) {
 		break;
 	case '--delete':
 		deleteData();
+		break;
+	default:
 		break;
 }

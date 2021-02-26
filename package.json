@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "nodemon server.js",
     "prod": "set NODE_ENV=production&&nodemon server.js",
-    "debug": "ndb server.js"
+    "debug": "ndb server.js",
+    "clear db": "node ./dev-data/data/import-dev-data.js --delete",
+    "import db": "node ./dev-data/data/import-dev-data.js --import"
   },
   "author": "Ícaro Motta",
   "license": "ISC",
