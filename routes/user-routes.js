@@ -5,8 +5,8 @@ const authCon = require('../controllers/auth-controller');
 const router = express.Router();
 
 router
-	.get('/', authCon.protect, userCon.getAllUsers)
-	//.post('/', userCon.createUser)
+	.get('/', authCon.protect, authCon.restrictTo('admin'), userCon.getAllUsers)
+	.post('/', authCon.protect, authCon.restrictTo('admin'), userCon.createUser)
 	.post('/signup', authCon.signup)
 	.post('/login', authCon.login)
 	.post('/forgotPassword', authCon.forgotPassword)
@@ -14,9 +14,14 @@ router
 	.patch('/updatePassword', authCon.protect, authCon.updatePassword)
 	.patch('/updateMyAccount', authCon.protect, userCon.updateSelf)
 	.delete('/deleteMyAccount', authCon.protect, userCon.deleteSelf)
-	.post('/confirmEmail/:token', authCon.confirmEmail);
-//.get('/:id', userCon.getUser)
-//.patch('/:id', userCon.updateUser);
-//.delete('/:id', userCon.deleteUser);
+	.post('/confirmEmail/:token', authCon.confirmEmail)
+	.get('/:id', authCon.protect, authCon.restrictTo('admin'), userCon.getUser);
+// .patch(
+// 	'/:id',
+// 	authCon.protect,
+// 	authCon.restrictTo('admin'),
+// 	userCon.updateUser
+// );
+//.delete('/:id', authCon.protect, authCon.restrictTo('admin'), userCon.deleteUser);
 
 module.exports = router;
