@@ -6,7 +6,7 @@ const router = express.Router();
 
 router
 	.get('/', authCon.protect, authCon.restrictTo('admin'), userCon.getAllUsers)
-	.post('/', authCon.protect, authCon.restrictTo('admin'), userCon.createUser)
+	.post('/', authCon.protect, authCon.restrictTo('admin'), userCon.addUser)
 	.post('/signup', authCon.signup)
 	.post('/login', authCon.login)
 	.post('/forgotPassword', authCon.forgotPassword)
@@ -15,13 +15,19 @@ router
 	.patch('/updateMyAccount', authCon.protect, userCon.updateSelf)
 	.delete('/deleteMyAccount', authCon.protect, userCon.deleteSelf)
 	.post('/confirmEmail/:token', authCon.confirmEmail)
-	.get('/:id', authCon.protect, authCon.restrictTo('admin'), userCon.getUser);
-// .patch(
-// 	'/:id',
-// 	authCon.protect,
-// 	authCon.restrictTo('admin'),
-// 	userCon.updateUser
-// );
+	.get('/:id', authCon.protect, authCon.restrictTo('admin'), userCon.getUser)
+	.delete(
+		'/:id',
+		authCon.protect,
+		authCon.restrictTo('admin'),
+		userCon.deleteUser
+	)
+	.patch(
+		'/:id',
+		authCon.protect,
+		authCon.restrictTo('admin'),
+		userCon.updateUser
+	);
 //.delete('/:id', authCon.protect, authCon.restrictTo('admin'), userCon.deleteUser);
 
 module.exports = router;

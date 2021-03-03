@@ -1,90 +1,18 @@
 const Tour = require('../models/tour-model');
-const APIFeatures = require('../utils/APIFeatures');
 const globalCatch = require('../utils/GlobalCatch');
-const AppError = require('../utils/AppError');
+const handlers = require('./handlerFactory');
+
+exports.getAllTours = handlers.getAll(Tour);
+exports.getTour = handlers.getOne(Tour, {path: 'reviews'});
+exports.addTour = handlers.createOne(Tour);
+exports.updateTour = handlers.updateOne(Tour);
+exports.deleteTour = handlers.deleteOne(Tour);
 
 exports.topTours = globalCatch(async (req, res, next) => {
 	req.query.limit = '5';
 	req.query.sort = '-ratingsAverage,price';
 	req.query.fields = 'name,price,ratingsAverage,summary,difficulty';
 	next();
-});
-
-exports.getAllTours = globalCatch(async (req, res, next) => {
-	const features = new APIFeatures(Tour.find(), req.query)
-		.filter()
-		.search()
-		.sort()
-		.limitFields()
-		.paginate();
-	const tours = await features.query;
-
-	res.status(200).json({
-		status: 'success',
-		requestedAt: req.requestTime,
-		results: tours.length,
-		data: {
-			tours,
-		},
-	});
-});
-
-exports.getTour = globalCatch(async (req, res, next) => {
-	const tour = await Tour.findById(req.params.id);
-
-	if (!tour) {
-		return next(new AppError(`No tour found with ID ${req.params.id}`, 404));
-	}
-
-	res.status(200).json({
-		status: 'success',
-		requestedAt: req.requestTime,
-		data: {
-			tour,
-		},
-	});
-});
-
-exports.addTour = globalCatch(async (req, res, next) => {
-	const newTour = await Tour.create(req.body);
-
-	res.status(201).json({
-		status: 'success',
-		data: {tour: newTour},
-	});
-});
-
-exports.updateTour = globalCatch(async (req, res, next) => {
-	const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
-		new: true,
-		runValidators: true,
-	});
-
-	if (!tour) {
-		return next(new AppError(`No tour found with ID ${req.params.id}`, 404));
-	}
-
-	res.status(200).json({
-		status: 'success',
-		requestedAt: req.requestTime,
-		data: {
-			tour,
-		},
-	});
-});
-
-exports.deleteTour = globalCatch(async (req, res, next) => {
-	const tour = await Tour.findByIdAndDelete(req.params.id);
-
-	if (!tour) {
-		return next(new AppError(`No tour found with ID ${req.params.id}`, 404));
-	}
-
-	res.status(204).json({
-		status: 'success',
-		requestedAt: req.requestTime,
-		data: null,
-	});
 });
 
 exports.getTourStats = globalCatch(async (req, res, next) => {

@@ -1,6 +1,6 @@
-const mongoose = require('mongoose');
+const {Schema, model} = require('mongoose');
 
-const tourSchema = new mongoose.Schema(
+const tourSchema = new Schema(
 	{
 		name: {
 			type: String,
@@ -96,7 +96,7 @@ const tourSchema = new mongoose.Schema(
 		],
 		guides: [
 			{
-				type: mongoose.Schema.ObjectId,
+				type: Schema.ObjectId,
 				ref: 'User',
 			},
 		],
@@ -109,6 +109,12 @@ const tourSchema = new mongoose.Schema(
 
 tourSchema.virtual('durationWeeks').get(function () {
 	return this.duration / 7;
+});
+
+tourSchema.virtual('reviews', {
+	ref: 'Review',
+	foreignField: 'tour',
+	localField: '_id',
 });
 
 tourSchema.pre(/^find/, function (next) {
@@ -127,5 +133,5 @@ tourSchema.pre(/^find/, function (next) {
 // 	next();
 // });
 
-const Tour = mongoose.model('Tour', tourSchema);
+const Tour = model('Tour', tourSchema);
 module.exports = Tour;

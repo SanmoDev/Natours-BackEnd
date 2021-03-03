@@ -1,6 +1,12 @@
 const AppError = require('../utils/AppError');
 const User = require('../models/user-model');
 const globalCatch = require('../utils/GlobalCatch');
+const handlers = require('./handlerFactory');
+
+exports.getAllUsers = handlers.getAll(User);
+exports.getUser = handlers.getOne(User);
+exports.updateUser = handlers.updateOne(User);
+exports.deleteUser = handlers.deleteOne(User);
 
 const filterObj = (obj, ...allowed) => {
 	const newObj = {};
@@ -11,18 +17,12 @@ const filterObj = (obj, ...allowed) => {
 	return newObj;
 };
 
-exports.getAllUsers = globalCatch(async (req, res, next) => {
-	const users = await User.find().select('-__v');
-
-	res.status(200).json({
-		status: 'success',
-		requestedAt: req.requestTime,
-		results: users.length,
-		data: {
-			users,
-		},
+exports.addUser = (req, res) => {
+	res.status(500).json({
+		status: 'error',
+		message: 'This route is not defined, please use /signup instead',
 	});
-});
+};
 
 exports.updateSelf = globalCatch(async (req, res, next) => {
 	//ERROR IF USER POSTS PASSWORD
@@ -55,42 +55,3 @@ exports.deleteSelf = globalCatch(async (req, res, next) => {
 		data: null,
 	});
 });
-
-exports.getUser = globalCatch(async (req, res, next) => {
-	const user = await User.findById(req.params.id);
-
-	res.status(200).json({
-		status: 'success',
-		data: {user},
-	});
-});
-
-exports.createUser = globalCatch(async (req, res, next) => {
-	const newUser = await User.create({...req.body});
-
-	res.status(201).json({
-		status: 'success',
-		requestedAt: req.requestTime,
-		data: {newUser},
-	});
-});
-
-exports.updateUser = globalCatch(async (req, res, next) => {
-	const user = await User.findByIdAndUpdate(req.params.id, req.body, {
-		new: true,
-		runValidators: true,
-	});
-
-	res.status(200).json({
-		status: 'success',
-		data: {user},
-	});
-});
-
-// exports.deleteUser = ({requestTime}, res) => {
-// 	res.status(204).json({
-// 		status: 'success',
-// 		requestedAt: requestTime,
-// 		data: null,
-// 	});
-// };
