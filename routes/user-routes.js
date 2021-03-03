@@ -4,30 +4,30 @@ const authCon = require('../controllers/auth-controller');
 
 const router = express.Router();
 
+//PUBLIC ROUTES
 router
-	.get('/', authCon.protect, authCon.restrictTo('admin'), userCon.getAllUsers)
-	.post('/', authCon.protect, authCon.restrictTo('admin'), userCon.addUser)
 	.post('/signup', authCon.signup)
 	.post('/login', authCon.login)
 	.post('/forgotPassword', authCon.forgotPassword)
 	.patch('/resetPassword/:token', authCon.resetPassword)
-	.patch('/updatePassword', authCon.protect, authCon.updatePassword)
-	.patch('/updateMyAccount', authCon.protect, userCon.updateSelf)
-	.delete('/deleteMyAccount', authCon.protect, userCon.deleteSelf)
-	.post('/confirmEmail/:token', authCon.confirmEmail)
-	.get('/:id', authCon.protect, authCon.restrictTo('admin'), userCon.getUser)
-	.delete(
-		'/:id',
-		authCon.protect,
-		authCon.restrictTo('admin'),
-		userCon.deleteUser
-	)
-	.patch(
-		'/:id',
-		authCon.protect,
-		authCon.restrictTo('admin'),
-		userCon.updateUser
-	);
-//.delete('/:id', authCon.protect, authCon.restrictTo('admin'), userCon.deleteUser);
+	.post('/confirmEmail/:token', authCon.confirmEmail);
+
+//USER ROUTES (must be logged in)
+router.use(authCon.protect);
+router
+	.get('/me', userCon.getMe, userCon.getUser)
+	.patch('/updatePassword', authCon.updatePassword)
+	.patch('/updateMyAccount', userCon.updateSelf)
+	.delete('/deleteMyAccount', userCon.deleteSelf);
+
+//ADMIN ONLY ROUTES
+router.use(authCon.restrictTo('admin'));
+router
+	.get('/', userCon.getAllUsers)
+	.post('/', userCon.addUser)
+	.get('/:id', userCon.getUser)
+	.delete('/:id', userCon.deleteUser)
+	.patch('/:id', userCon.updateUser)
+	.delete('/:id', userCon.deleteUser);
 
 module.exports = router;

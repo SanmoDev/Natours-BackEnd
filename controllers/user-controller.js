@@ -8,6 +8,11 @@ exports.getUser = handlers.getOne(User);
 exports.updateUser = handlers.updateOne(User);
 exports.deleteUser = handlers.deleteOne(User);
 
+exports.getMe = (req, res, next) => {
+	req.params.id = req.user.id;
+	next();
+};
+
 const filterObj = (obj, ...allowed) => {
 	const newObj = {};
 	Object.keys(obj).forEach(el => {
