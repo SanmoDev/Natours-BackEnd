@@ -1,6 +1,6 @@
 const express = require('express');
-const tourCon = require('../controllers/tour-controller');
-const {protect, restrictTo} = require('../controllers/auth-controller');
+const tourCon = require('../controllers/TourController');
+const {protect, restrictTo} = require('../controllers/AuthController');
 const reviewRouter = require('./review-routes');
 
 const router = express.Router();
@@ -21,7 +21,5 @@ router
 		restrictTo('admin', 'lead-guide'),
 		tourCon.deleteTour
 	);
-
-//rotas com :id tem que estar em baixo
 
 module.exports = router;

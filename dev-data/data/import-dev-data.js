@@ -1,28 +1,31 @@
 const fs = require('fs');
-const mongoose = require('mongoose');
+const {connect} = require('mongoose');
 const env = require('dotenv');
-const Tour = require('../../models/tour-model');
+const Tour = require('../../models/TourModel');
+const User = require('../../models/UserModel');
+const Review = require('../../models/ReviewModel');
 
 env.config({path: './config.env'});
 
-const DB = process.env.DATABASE.replace('PASSWORD', process.env.PASSWORD);
-
-mongoose
-	.connect(DB, {
-		useNewUrlParser: true,
-		useCreateIndex: true,
-		useFindAndModify: false,
-	})
-	.then(() => {
-		console.log('Conexão feita com sucesso!');
-	});
+connect(process.env.DATABASE, {
+	useNewUrlParser: true,
+	useUnifiedTopology: true,
+	useCreateIndex: true,
+	useFindAndModify: false,
+}).then(() => console.log('Connected to database'));
 
 const tours = JSON.parse(fs.readFileSync(`${__dirname}/tours.json`, 'utf-8'));
+const users = JSON.parse(fs.readFileSync(`${__dirname}/users.json`, 'utf-8'));
+const reviews = JSON.parse(
+	fs.readFileSync(`${__dirname}/reviews.json`, 'utf-8')
+);
 
 const importData = async () => {
 	try {
 		await Tour.create(tours);
-		console.log('Tours criados com sucesso');
+		await User.create(users, {validateBeforeSave: false});
+		await Review.create(reviews);
+		console.log('Documentos criados com sucesso');
 	} catch (err) {
 		console.log(err);
 	} finally {
@@ -33,6 +36,8 @@ const importData = async () => {
 const deleteData = async () => {
 	try {
 		await Tour.deleteMany();
+		await User.deleteMany();
+		await Review.deleteMany();
 		console.log('O banco de dados foi zerado com sucesso');
 	} catch (err) {
 		console.log(err);

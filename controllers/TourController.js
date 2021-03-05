@@ -1,6 +1,6 @@
-const Tour = require('../models/tour-model');
+const Tour = require('../models/TourModel');
 const globalCatch = require('../utils/GlobalCatch');
-const handlers = require('./handlerFactory');
+const handlers = require('./HandlerFactory');
 
 exports.getAllTours = handlers.getAll(Tour);
 exports.getTour = handlers.getOne(Tour, {path: 'reviews'});

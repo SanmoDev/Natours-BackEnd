@@ -1,7 +1,7 @@
 const AppError = require('../utils/AppError');
-const User = require('../models/user-model');
+const User = require('../models/UserModel');
 const globalCatch = require('../utils/GlobalCatch');
-const handlers = require('./handlerFactory');
+const handlers = require('./HandlerFactory');
 
 exports.getAllUsers = handlers.getAll(User);
 exports.getUser = handlers.getOne(User);

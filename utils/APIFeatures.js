@@ -10,7 +10,11 @@ class APIFeatures {
 		['page', 'sort', 'limit', 'fields', 'search'].forEach(el => {
 			delete newQuery[el];
 		});
-		this.query = this.query.find(newQuery);
+
+		let str = JSON.stringify(newQuery);
+		str = str.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
+
+		this.query = this.query.find(JSON.parse(str));
 		return this;
 	}
 

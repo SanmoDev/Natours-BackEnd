@@ -6,7 +6,7 @@ const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
 const cors = require('cors');
-const errorHandler = require('./controllers/error-controller');
+const errorHandler = require('./controllers/ErrorController');
 
 const app = express();
 

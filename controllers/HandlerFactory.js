@@ -2,29 +2,6 @@ const AppError = require('../utils/AppError');
 const globalCatch = require('../utils/GlobalCatch');
 const APIFeatures = require('../utils/APIFeatures');
 
-exports.getAll = Model =>
-	globalCatch(async (req, res, next) => {
-		//little hack to allow for the GetTourReviews endpoint
-		const filter = req.params.tourId ? {tour: req.params.tourId} : {};
-
-		const features = new APIFeatures(Model.find(filter), req.query)
-			.filter()
-			.search()
-			.sort()
-			.limitFields()
-			.paginate();
-		const doc = await features.query;
-
-		res.status(200).json({
-			status: 'success',
-			requestedAt: req.requestTime,
-			results: doc.length,
-			data: {
-				data: doc,
-			},
-		});
-	});
-
 exports.getOne = (Model, populate) =>
 	globalCatch(async (req, res, next) => {
 		let query = Model.findById(req.params.id);
@@ -44,6 +21,29 @@ exports.getOne = (Model, populate) =>
 			requestedAt: req.requestTime,
 			data: {
 				document: doc,
+			},
+		});
+	});
+
+exports.getAll = Model =>
+	globalCatch(async (req, res, next) => {
+		//little hack to allow for the GetTourReviews endpoint
+		const filter = req.params.tourId ? {tour: req.params.tourId} : {};
+
+		const features = new APIFeatures(Model.find(filter), req.query)
+			.filter()
+			.search()
+			.sort()
+			.limitFields()
+			.paginate();
+		const doc = await features.query;
+
+		res.status(200).json({
+			status: 'success',
+			requestedAt: req.requestTime,
+			results: doc.length,
+			data: {
+				data: doc,
 			},
 		});
 	});
