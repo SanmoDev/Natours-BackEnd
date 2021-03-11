@@ -38,7 +38,9 @@ const handleValidationError = err => {
 const handleDuplicateError = err => {
 	const value = err.errmsg.match(/"(.*?)"/);
 	return new AppError(
-		`Duplicate field value ${value[0]}. Please use another value.`,
+		`Duplicate field value ${
+			value ? value[0] : 'inputted'
+		}. Please use another value.`,
 		400
 	);
 };
