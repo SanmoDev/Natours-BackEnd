@@ -19,6 +19,7 @@
     "no-unused-vars": ["warn", { "argsIgnorePattern": "req|res|next|val" }],
     "node/no-unsupported-features/es-syntax": "off",
     "radix": "off",
-    "no-multi-assign": "off"
+    "no-multi-assign": "off",
+    "no-nested-ternary": "off"
   }
 }

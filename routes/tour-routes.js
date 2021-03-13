@@ -12,6 +12,11 @@ router
 	.post('/', protect, restrictTo('admin', 'lead-guide'), tourCon.addTour)
 	.get('/top-tours', tourCon.topTours, tourCon.getAllTours)
 	.get('/tour-stats', tourCon.getTourStats)
+	.get('/distances/:latlng/unit/:unit', tourCon.getDistances)
+	.get(
+		'/tours-within/:distance/center/:latlng/unit/:unit',
+		tourCon.getToursWithin
+	)
 	.get('/monthly-plan/:year', tourCon.getMonthlyPlan)
 	.get('/:id', tourCon.getTour)
 	.patch('/:id', protect, restrictTo('admin', 'lead-guide'), tourCon.updateTour)

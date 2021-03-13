@@ -1,4 +1,5 @@
 const {Schema, model} = require('mongoose');
+const slugify = require('slugify');
 
 const tourSchema = new Schema(
 	{
@@ -10,6 +11,7 @@ const tourSchema = new Schema(
 			maxlength: [40, 'A tour name must have between 5 and 40 characters'],
 			minlength: [5, 'A tour name must have between 5 and 40 characters'],
 		},
+		slug: String,
 		duration: {
 			type: Number,
 			required: [true, 'A tour must have a duration'],
@@ -110,6 +112,7 @@ const tourSchema = new Schema(
 
 tourSchema.index({price: 1, ratingsAverage: -1});
 tourSchema.index({slug: 1});
+tourSchema.index({startLocation: '2dsphere'});
 
 tourSchema.virtual('durationWeeks').get(function () {
 	return this.duration / 7;
@@ -119,6 +122,11 @@ tourSchema.virtual('reviews', {
 	ref: 'Review',
 	foreignField: 'tour',
 	localField: '_id',
+});
+
+tourSchema.pre('save', function (next) {
+	this.slug = slugify(this.name, {lower: true});
+	next();
 });
 
 tourSchema.pre(/^find/, function (next) {
