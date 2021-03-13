@@ -1,3 +1,4 @@
+const path = require('path');
 const express = require('express');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
@@ -9,6 +10,12 @@ const cors = require('cors');
 const errorHandler = require('./controllers/ErrorController');
 
 const app = express();
+
+app.set('view engine', 'pug');
+app.set('views', path.join(__dirname, 'views'));
+
+//SERVING STATIC FILES
+app.use(express.static(path.join(__dirname, 'public')));
 
 //SET SECURITY HTTP HEADERS
 app.use(helmet());
@@ -51,20 +58,20 @@ app.use(
 	})
 );
 
-//SERVING STATIC FILES
-app.use(express.static(`${__dirname}/public`));
-
 //GET TIME OF REQUEST
 app.use((req, res, next) => {
 	req.requestTime = new Date().toISOString();
 	next();
 });
 
+//ROUTES
 const tourRouter = require('./routes/tour-routes');
 const userRouter = require('./routes/user-routes');
 const reviewRouter = require('./routes/review-routes');
+const viewRouter = require('./routes/view-routes');
 const AppError = require('./utils/AppError');
 
+app.use('/', viewRouter);
 app.use('/api/tours', tourRouter);
 app.use('/api/users', userRouter);
 app.use('/api/reviews', reviewRouter);
