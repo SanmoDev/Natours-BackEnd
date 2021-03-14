@@ -120,8 +120,11 @@ exports.protect = globalCatch(async (req, res, next) => {
 	if (
 		req.headers.authorization &&
 		req.headers.authorization.startsWith('Bearer')
-	)
+	) {
 		token = req.headers.authorization.split(' ')[1];
+	} else if (req.cookies.jwt) {
+		token = req.cookies.jwt;
+	}
 
 	if (!token) return next(new AppError('Please log in to get access.', 401));
 
@@ -141,6 +144,25 @@ exports.protect = globalCatch(async (req, res, next) => {
 		);
 
 	req.user = user;
+	next();
+});
+
+exports.isLoggedIn = globalCatch(async (req, res, next) => {
+	if (req.cookies.jwt) {
+		const decoded = await promisify(jwt.verify)(
+			req.cookies.jwt,
+			process.env.JWT_SECRET
+		);
+
+		const user = await User.findById(decoded.id);
+		if (!user) return next();
+
+		if (user.passwordChanged(decoded.iat)) return next();
+
+		//PUT USER IN A LOCAL VARIABLE AVAILABLE TO TEMPLATES
+		res.locals.user = user;
+		return next();
+	}
 	next();
 });
 
