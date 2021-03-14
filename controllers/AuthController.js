@@ -114,6 +114,15 @@ exports.login = globalCatch(async (req, res, next) => {
 	createSendToken(user, 200, res);
 });
 
+exports.logout = (req, res) => {
+	res.cookie('jwt', 'logged out', {
+		expires: new Date(Date.now() + 10000),
+		httpOnly: true,
+	});
+
+	res.status(200).json({status: 'success'});
+};
+
 exports.protect = globalCatch(async (req, res, next) => {
 	//CHECK IF TOKEN EXISTS AND IS VALID
 	let token;
@@ -147,24 +156,28 @@ exports.protect = globalCatch(async (req, res, next) => {
 	next();
 });
 
-exports.isLoggedIn = globalCatch(async (req, res, next) => {
+exports.isLoggedIn = async (req, res, next) => {
 	if (req.cookies.jwt) {
-		const decoded = await promisify(jwt.verify)(
-			req.cookies.jwt,
-			process.env.JWT_SECRET
-		);
+		try {
+			const decoded = await promisify(jwt.verify)(
+				req.cookies.jwt,
+				process.env.JWT_SECRET
+			);
 
-		const user = await User.findById(decoded.id);
-		if (!user) return next();
+			const user = await User.findById(decoded.id);
+			if (!user) return next();
 
-		if (user.passwordChanged(decoded.iat)) return next();
+			if (user.passwordChanged(decoded.iat)) return next();
 
-		//PUT USER IN A LOCAL VARIABLE AVAILABLE TO TEMPLATES
-		res.locals.user = user;
-		return next();
+			//PUT USER IN A LOCAL VARIABLE AVAILABLE TO TEMPLATES
+			res.locals.user = user;
+			return next();
+		} catch (err) {
+			return next();
+		}
 	}
 	next();
-});
+};
 
 exports.restrictTo = (...roles) => (req, res, next) => {
 	if (!roles.includes(req.user.role))

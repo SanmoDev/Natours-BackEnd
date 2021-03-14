@@ -6,11 +6,12 @@ const router = express.Router();
 
 //PUBLIC ROUTES
 router
-	.post('/signup', authCon.signup)
+	.get('/login', authCon.logout)
 	.post('/login', authCon.login)
+	.post('/signup', authCon.signup)
 	.post('/forgotPassword', authCon.forgotPassword)
-	.patch('/resetPassword/:token', authCon.resetPassword)
-	.post('/confirmEmail/:token', authCon.confirmEmail);
+	.post('/confirmEmail/:token', authCon.confirmEmail)
+	.patch('/resetPassword/:token', authCon.resetPassword);
 
 //USER ROUTES (must be logged in)
 router.use(authCon.protect);
