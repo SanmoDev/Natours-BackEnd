@@ -21,5 +21,8 @@
     "radix": "off",
     "no-multi-assign": "off",
     "no-nested-ternary": "off"
+  },
+  "parserOptions": {
+    "sourceType": "module"
   }
 }
