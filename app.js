@@ -7,6 +7,7 @@ const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 const errorHandler = require('./controllers/ErrorController');
 
 const app = express();
@@ -37,6 +38,7 @@ app.use('/api', limiter);
 
 //READ DATA FROM REQ.BODY
 app.use(express.json({limit: '10kb'}));
+app.use(cookieParser());
 
 //DATA SANITIZATION AGAINST NoSQL QUERY INJECTION
 app.use(mongoSanitize());

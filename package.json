@@ -8,12 +8,17 @@
     "prod": "set NODE_ENV=production&&nodemon server.js",
     "debug": "ndb server.js",
     "clear db": "node ./dev-data/data/import-dev-data.js --delete",
-    "import db": "node ./dev-data/data/import-dev-data.js --import"
+    "import db": "node ./dev-data/data/import-dev-data.js --import",
+    "watch js": "parcel watch ./public/js/index.js --out-dir ./public/js --out-file bundle.js --public-url /js",
+    "build js": "parcel watch ./public/js/index.js --out-dir ./public/js --out-file bundle.js --public-url /js"
   },
   "author": "Ícaro Motta",
   "license": "ISC",
   "dependencies": {
+    "@babel/polyfill": "^7.12.1",
+    "axios": "^0.21.1",
     "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
@@ -40,6 +45,7 @@
     "eslint-plugin-prettier": "^3.3.0",
     "eslint-plugin-react": "^7.21.5",
     "ndb": "^1.1.5",
+    "parcel-bundler": "^1.12.3",
     "prettier": "^2.2.1"
   }
 }
