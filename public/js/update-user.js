@@ -1,23 +1,21 @@
 /*eslint-disable*/
-import {showAlert} from './alerts';
 import axios from 'axios';
+import {showAlert} from './alerts';
 
-export const updateUser = async (...args) => {
+export const updateUser = async (data, type) => {
 	try {
 		const res = await axios({
 			method: 'PATCH',
-			url: '/api/users/login',
-			data: {
-				...args,
-			},
+			url:
+				type === 'data'
+					? '/api/users/UpdateMyAccount'
+					: '/api/users/updatePassword',
+			data: data,
 		});
 
 		if (res.data.status === 'success') {
-			showAlert('success', 'Logged in successfully');
-			window.setTimeout(() => location.assign('/'), 1000);
+			showAlert('success', `Your ${type} has been updated successfully`);
 		}
-
-		console.log(res);
 	} catch (err) {
 		showAlert('error', err.response.data.message);
 	}

@@ -38,6 +38,7 @@ app.use('/api', limiter);
 
 //READ DATA FROM REQ.BODY
 app.use(express.json({limit: '10kb'}));
+app.use(express.urlencoded({extended: true, limit: '10kb'}));
 app.use(cookieParser());
 
 //DATA SANITIZATION AGAINST NoSQL QUERY INJECTION

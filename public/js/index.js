@@ -2,11 +2,13 @@
 import '@babel/polyfill';
 import {displayMap} from './mapbox';
 import {login, logout} from './login';
+import {updateUser} from './update-user';
 
 //DOM ELEMENTS
 const mapBox = document.getElementById('map');
-const loginForm = document.querySelector('#login-form');
-const userForm = document.querySelector('#user-form');
+const loginForm = document.querySelector('.form--login');
+const userDataForm = document.querySelector('.form-user-data');
+const passwordForm = document.querySelector('.form-user-password');
 const logoutBtn = document.querySelector('.nav__el--logout');
 
 //DELEGATION
@@ -25,12 +27,40 @@ if (loginForm) {
 	});
 }
 
-if (userForm) {
-	userForm.addEventListener('submit', e => {
+if (userDataForm) {
+	userDataForm.addEventListener('submit', async e => {
 		e.preventDefault();
-		const name = document.getElementById('email').value;
+
+		const btn = document.querySelector('.btn--data');
+		const name = document.getElementById('name').value;
 		const email = document.getElementById('email').value;
-		const photo = document.getElementById('email').value;
+
+		btn.disabled = true;
+		btn.textContent = 'Updating...';
+		await updateUser({name, email}, 'data');
+		btn.disabled = false;
+		btn.textContent = 'Save settings';
+	});
+}
+
+if (passwordForm) {
+	passwordForm.addEventListener('submit', async e => {
+		e.preventDefault();
+
+		const btn = document.querySelector('.btn--password');
+		const passwordCurrent = document.getElementById('password-current').value;
+		const password = document.getElementById('password').value;
+		const passwordConfirm = document.getElementById('password-confirm').value;
+
+		btn.disabled = true;
+		btn.textContent = 'Updating...';
+		await updateUser({passwordCurrent, password, passwordConfirm}, 'password');
+		btn.disabled = false;
+		btn.textContent = 'Save password';
+
+		document.getElementById('password-current').value = '';
+		document.getElementById('password').value = '';
+		document.getElementById('password-confirm').value = '';
 	});
 }
 
