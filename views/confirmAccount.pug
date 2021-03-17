@@ -1,0 +1,11 @@
+extend base
+
+block content
+    main.main
+        .error
+            .error__title
+                h2.heading-secondary.heading-secondary--error Confirming your account!
+                h2.error__emoji 😍 🙌
+            .error__msg Please wait for a moment
+            .error__msg You will be redirected soon
+    meta#token(token=`${token}`)

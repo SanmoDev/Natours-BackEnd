@@ -3,13 +3,17 @@ import '@babel/polyfill';
 import {displayMap} from './mapbox';
 import {login, logout} from './login';
 import {updateUser} from './update-user';
+import {confirmAccount} from './confirmAccount';
 
 //DOM ELEMENTS
 const mapBox = document.getElementById('map');
 const loginForm = document.querySelector('.form--login');
+const resetPassBtn = document.querySelector('#resetPassword');
+const goToSignup = document.querySelector('#goToSignup');
 const userDataForm = document.querySelector('.form-user-data');
 const passwordForm = document.querySelector('.form-user-password');
 const logoutBtn = document.querySelector('.nav__el--logout');
+const tokenField = document.querySelector('#token');
 
 //DELEGATION
 if (mapBox) {
@@ -25,6 +29,13 @@ if (loginForm) {
 
 		login(email, password);
 	});
+
+	goToSignup.addEventListener('click', e => {
+		location.assign('/signup');
+	})
+
+	//TODO ADICIONAR FUNÇÃO DE RESETAR SENHA
+	//resetPassBtn.addEventListener('click', e => {});
 }
 
 if (userDataForm) {
@@ -68,3 +79,5 @@ if (passwordForm) {
 }
 
 if (logoutBtn) logoutBtn.addEventListener('click', logout);
+
+if (tokenField) confirmAccount(tokenField.getAttribute('token'));

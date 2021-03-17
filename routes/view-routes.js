@@ -12,6 +12,7 @@ router
 	.get('/', viewsCon.getOverview)
 	.get('/login', viewsCon.loginForm)
 	.get('/account', protect, viewsCon.myAccount)
-	.get('/tour/:slug', viewsCon.getTour);
+	.get('/tour/:slug', viewsCon.getTour)
+	.get('/confirmAccount/:token', viewsCon.confirmAccount);
 
 module.exports = router;

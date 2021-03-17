@@ -4,7 +4,7 @@ const crypto = require('crypto');
 const User = require('../models/UserModel');
 const globalCatch = require('../utils/GlobalCatch');
 const AppError = require('../utils/AppError');
-const sendEmail = require('../utils/Email');
+const Email = require('../utils/Email');
 
 const signToken = id =>
 	jwt.sign({id}, process.env.JWT_SECRET, {
@@ -47,22 +47,13 @@ exports.signup = globalCatch(async (req, res, next) => {
 	const confirmToken = user.createEmailConfirmToken();
 	await user.save({validateBeforeSave: false});
 
-	const URL = `${req.protocol}://${req.get(
-		'host'
-	)}/api/users/confirmEmail/${confirmToken}`;
-
-	const message = `Did you just create an account at Natours.com? Click the link below to confirm your email\n${URL}\nIf you didn't, please ignore this email`;
-
 	try {
-		await sendEmail({
-			email: user.email,
-			subject: 'Natours email confirmation token (valid for 10min)',
-			message,
-		});
+		const URL = `${req.protocol}://${req.get('host')}/confirmAccount/${confirmToken}`;
+		await new Email(user, URL).sendWelcome();
 
 		res.status(201).json({
 			status: 'success',
-			message: 'User created successfully, please confirm your email',
+			message: 'User created successfully, please check your email for your account validation token',
 		});
 	} catch (err) {
 		user.emailConfirmToken = undefined;
@@ -203,11 +194,11 @@ exports.forgotPassword = globalCatch(async (req, res, next) => {
 	const message = `Forgot your password? Click the link below to reset it\n${resetURL}\nIf you didn't, please ignore this email`;
 
 	try {
-		await sendEmail({
-			email: user.email,
-			subject: 'Your password reset Token (valid for 10min)',
-			message,
-		});
+		// await sendEmail({
+		// 	email: user.email,
+		// 	subject: 'Your password reset Token (valid for 10min)',
+		// 	message,
+		// });
 
 		res.status(200).json({
 			status: 'success',

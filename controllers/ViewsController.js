@@ -18,7 +18,9 @@ exports.getTour = globalCatch(async (req, res, next) => {
 	});
 
 	if (!tour)
-		return next(new AppError('Please input a correct tour name in the url', 404));
+		return next(
+			new AppError('Please input a correct tour name in the url', 404)
+		);
 
 	res
 		.status(200)
@@ -47,5 +49,12 @@ exports.loginForm = (req, res) => {
 exports.myAccount = (req, res) => {
 	res.status(200).render('myAccount', {
 		title: 'My account',
+	});
+};
+
+exports.confirmAccount = (req, res) => {
+	res.status(200).render('confirmAccount', {
+		title: 'Account confirmation',
+		token: req.params.token,
 	});
 };
