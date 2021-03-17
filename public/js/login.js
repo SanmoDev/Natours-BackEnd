@@ -30,8 +30,13 @@ export const logout = async () => {
 			method: 'GET',
 			url: '/api/users/login',
 		});
-
-		if (res.data.status === 'success') location.reload(true);
+		
+		if (res.data.status === 'success') {
+			if(location.pathname === '/account')
+				location.assign('/');
+			else
+				location.reload(true);
+		}
 	} catch (err) {
 		showAlert('error', 'Error logging out, please try again.');
 	}

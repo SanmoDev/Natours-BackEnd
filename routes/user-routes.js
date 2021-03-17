@@ -18,7 +18,12 @@ router.use(authCon.protect);
 router
 	.get('/me', userCon.getMe, userCon.getUser)
 	.patch('/updatePassword', authCon.updatePassword)
-	.patch('/updateMyAccount', userCon.updateSelf)
+	.patch(
+		'/updateMyAccount',
+		userCon.uploadUserPhoto,
+		userCon.resizeUserPhoto,
+		userCon.updateSelf
+	)
 	.delete('/deleteMyAccount', userCon.deleteSelf);
 
 //ADMIN ONLY ROUTES

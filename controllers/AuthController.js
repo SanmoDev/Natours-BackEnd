@@ -153,6 +153,7 @@ exports.protect = globalCatch(async (req, res, next) => {
 		);
 
 	req.user = user;
+	res.locals.user = user;
 	next();
 });
 
