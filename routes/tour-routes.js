@@ -19,7 +19,14 @@ router
 	)
 	.get('/monthly-plan/:year', tourCon.getMonthlyPlan)
 	.get('/:id', tourCon.getTour)
-	.patch('/:id', protect, restrictTo('admin', 'lead-guide'), tourCon.updateTour)
+	.patch(
+		'/:id',
+		protect,
+		restrictTo('admin', 'lead-guide'),
+		tourCon.uploadTourImages,
+		tourCon.resizeTourImages,
+		tourCon.updateTour
+	)
 	.delete(
 		'/:id',
 		protect,
