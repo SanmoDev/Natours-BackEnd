@@ -8493,7 +8493,11 @@ function () {
 
           case 3:
             res = _context2.sent;
-            if (res.data.status === 'success') location.reload(true);
+
+            if (res.data.status === 'success') {
+              if (location.pathname === '/account') location.assign('/');else location.reload(true);
+            }
+
             _context2.next = 10;
             break;
 
@@ -8773,11 +8777,12 @@ var _login = require("./login");
 
 //DOM ELEMENTS
 var mapBox = document.getElementById('map');
-var loginForm = document.querySelector('.form');
+var loginForm = document.querySelector('#login-form');
+var userForm = document.querySelector('#user-form');
 var logoutBtn = document.querySelector('.nav__el--logout'); //DELEGATION
 
 if (mapBox) {
-  var locations = JSON.parse(el.dataset.locations);
+  var locations = JSON.parse(mapBox.dataset.locations);
   (0, _mapbox.displayMap)(locations);
 }
 
@@ -8787,6 +8792,15 @@ if (loginForm) {
     var email = document.getElementById('email').value;
     var password = document.getElementById('password').value;
     (0, _login.login)(email, password);
+  });
+}
+
+if (userForm) {
+  userForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var name = document.getElementById('email').value;
+    var email = document.getElementById('email').value;
+    var photo = document.getElementById('email').value;
   });
 }
 
@@ -8819,7 +8833,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "56300" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "50480" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

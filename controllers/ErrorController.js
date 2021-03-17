@@ -1,30 +1,54 @@
 const AppError = require('../utils/AppError');
 
-const sendErrorDev = (err, res) => {
-	res.status(err.statusCode).json({
-		status: err.status,
-		error: err,
+const sendErrorDev = (err, req, res) => {
+	if (req.originalUrl.startsWith('/api')) {
+		console.error(err);
+		return res.status(err.statusCode).json({
+			status: err.status,
+			error: err,
+			message: err.message,
+			stack: err.stack,
+		});
+	}
+
+	console.error(err);
+	return res.status(err.statusCode).render('error', {
+		title: 'An error occurred',
 		message: err.message,
-		stack: err.stack,
 	});
 };
 
-const sendErrorProd = (err, res) => {
-	//Erro operacional, pode informá-lo ao cliente
-	if (err.isOperational) {
-		res.status(err.statusCode).json({
-			status: err.status,
-			message: err.message,
-		});
-	}
-	//Erro de código, não informá-lo ao cliente, apenas no console do host
-	else {
-		console.error('ERRO DE CÓDIGO:', err);
-		res.status(500).json({
+const sendErrorProd = (err, req, res) => {
+	if (req.originalUrl.startsWith('/api')) {
+		if (err.isOperational) {
+			//Operational error, inform it to the client
+			console.error(err);
+			return res.status(err.statusCode).json({
+				status: err.status,
+				message: err.message,
+			});
+		}
+
+		//Code error, inform it only in the host console
+		console.error(err);
+		return res.status(500).json({
 			status: 'error',
 			message: 'An error has occurred',
 		});
 	}
+
+	console.error(err);
+
+	if (err.isOperational) {
+		return res.status(err.statusCode).render('error', {
+			title: 'An error has occurred',
+			message: err.message,
+		});
+	}
+	return res.status(err.statusCode).render('error', {
+		title: 'An error has occurred',
+		message: 'Please try again later',
+	});
 };
 
 const handleCastError = err =>
@@ -55,7 +79,7 @@ module.exports = (err, req, res, next) => {
 	err.statusCode = err.statusCode || 500;
 	err.status = err.status || 'Unknown error occurred';
 
-	if (process.env.NODE_ENV === 'development') sendErrorDev(err, res);
+	if (process.env.NODE_ENV === 'development') sendErrorDev(err, req, res);
 
 	if (process.env.NODE_ENV === 'production') {
 		if (err.code === 11000) err = handleDuplicateError(err);
@@ -77,6 +101,6 @@ module.exports = (err, req, res, next) => {
 					break;
 			}
 		}
-		sendErrorProd(err, res);
+		sendErrorProd(err, req, res);
 	}
 };

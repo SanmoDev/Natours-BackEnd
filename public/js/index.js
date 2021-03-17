@@ -5,12 +5,13 @@ import {login, logout} from './login';
 
 //DOM ELEMENTS
 const mapBox = document.getElementById('map');
-const loginForm = document.querySelector('.form');
+const loginForm = document.querySelector('#login-form');
+const userForm = document.querySelector('#user-form');
 const logoutBtn = document.querySelector('.nav__el--logout');
 
 //DELEGATION
 if (mapBox) {
-	const locations = JSON.parse(el.dataset.locations);
+	const locations = JSON.parse(mapBox.dataset.locations);
 	displayMap(locations);
 }
 
@@ -21,6 +22,15 @@ if (loginForm) {
 		const password = document.getElementById('password').value;
 
 		login(email, password);
+	});
+}
+
+if (userForm) {
+	userForm.addEventListener('submit', e => {
+		e.preventDefault();
+		const name = document.getElementById('email').value;
+		const email = document.getElementById('email').value;
+		const photo = document.getElementById('email').value;
 	});
 }
 
