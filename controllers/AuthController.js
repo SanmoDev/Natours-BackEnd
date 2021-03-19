@@ -48,12 +48,15 @@ exports.signup = globalCatch(async (req, res, next) => {
 	await user.save({validateBeforeSave: false});
 
 	try {
-		const URL = `${req.protocol}://${req.get('host')}/confirmAccount/${confirmToken}`;
+		const URL = `${req.protocol}://${req.get(
+			'host'
+		)}/confirmAccount/${confirmToken}`;
 		await new Email(user, URL).sendWelcome();
 
 		res.status(201).json({
 			status: 'success',
-			message: 'User created successfully, please check your email for your account validation token',
+			message:
+				'User created successfully, please check your email for your account validation token',
 		});
 	} catch (err) {
 		user.emailConfirmToken = undefined;
@@ -143,6 +146,11 @@ exports.protect = globalCatch(async (req, res, next) => {
 			)
 		);
 
+	if (!user.active)
+		return next(
+			new AppError('Please check your email for your confirmation token')
+		);
+
 	req.user = user;
 	res.locals.user = user;
 	next();
@@ -186,19 +194,12 @@ exports.forgotPassword = globalCatch(async (req, res, next) => {
 	//GENERATE RANDOM RESET TOKEN
 	const resetToken = user.createPwResetToken();
 	await user.save({validateBeforeSave: false});
-	//SEND TOKEN TO USER EMAIL
-	const resetURL = `${req.protocol}://${req.get(
-		'host'
-	)}/api/users/resetPassword/${resetToken}`;
-
-	const message = `Forgot your password? Click the link below to reset it\n${resetURL}\nIf you didn't, please ignore this email`;
 
 	try {
-		// await sendEmail({
-		// 	email: user.email,
-		// 	subject: 'Your password reset Token (valid for 10min)',
-		// 	message,
-		// });
+		const URL = `${req.protocol}://${req.get(
+			'host'
+		)}/resetPassword/${resetToken}`;
+		await new Email(user, URL).sendWelcome();
 
 		res.status(200).json({
 			status: 'success',

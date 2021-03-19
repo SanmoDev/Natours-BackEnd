@@ -10,9 +10,12 @@ router.use(isLoggedIn);
 
 router
 	.get('/', viewsCon.getOverview)
-	.get('/login', viewsCon.loginForm)
+	.get('/login', viewsCon.login)
+	.get('/signup', viewsCon.signup)
+	.get('/forgotPassword', viewsCon.forgotPass)
 	.get('/account', protect, viewsCon.myAccount)
 	.get('/tour/:slug', viewsCon.getTour)
+	.get('/resetPassword/:token', viewsCon.resetPass)
 	.get('/confirmAccount/:token', viewsCon.confirmAccount);
 
 module.exports = router;

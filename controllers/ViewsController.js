@@ -34,16 +34,16 @@ exports.getTour = globalCatch(async (req, res, next) => {
 		});
 });
 
-exports.loginForm = (req, res) => {
-	res
-		.status(200)
-		.set(
-			'Content-Security-Policy',
-			"default-src 'self' https://*.mapbox.com ;base-uri 'self';block-all-mixed-content;font-src 'self' https: data:;frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src https://cdnjs.cloudflare.com https://api.mapbox.com 'self' blob: ;script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests;"
-		)
-		.render('login', {
-			title: 'Login page',
-		});
+exports.login = (req, res) => {
+	res.status(200).render('login', {
+		title: 'Login page',
+	});
+};
+
+exports.signup = (req, res) => {
+	res.status(200).render('signup', {
+		title: 'Signup page',
+	});
 };
 
 exports.myAccount = (req, res) => {
@@ -55,6 +55,19 @@ exports.myAccount = (req, res) => {
 exports.confirmAccount = (req, res) => {
 	res.status(200).render('confirmAccount', {
 		title: 'Account confirmation',
+		token: req.params.token,
+	});
+};
+
+exports.forgotPass = (req, res) => {
+	res.status(200).render('forgotPassword', {
+		title: 'Password recovery',
+	});
+};
+
+exports.resetPass = (req, res) => {
+	res.status(200).render('resetPassword', {
+		title: 'Password reset',
 		token: req.params.token,
 	});
 };

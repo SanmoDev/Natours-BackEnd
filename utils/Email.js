@@ -7,13 +7,17 @@ module.exports = class Email {
 		this.to = user.email;
 		this.firstName = user.name.split(' ')[0];
 		this.url = url;
-		this.from = `Ícaro Gomes Motta <${process.env.EMAIL_FROM}>`;
 	}
 
 	newTransport() {
-		if (process.env.NODE_ENV === 'production') {
-			//SENDGRID
-			return 1;
+		if (process.env.NODE_ENV.includes('production')) {
+			return nodemailer.createTransport({
+				service: 'SendGrid',
+				auth: {
+					user: 'apikey',
+					pass: process.env.SENDGRID_API_KEY,
+				},
+			});
 		}
 
 		//CREATE TRANSPORTER
@@ -39,7 +43,7 @@ module.exports = class Email {
 		);
 		//Define email options
 		const mailOptions = {
-			from: this.from,
+			from: process.env.EMAIL_FROM,
 			to: this.to,
 			subject,
 			html,
@@ -53,6 +57,13 @@ module.exports = class Email {
 		await this.send(
 			'welcome',
 			'Natours email confirmation token (valid for 10min)'
+		);
+	}
+
+	async sendPassReset() {
+		await this.send(
+			'passwordReset',
+			'Natours password reset token (valid for 10min)'
 		);
 	}
 };

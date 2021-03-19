@@ -2,18 +2,22 @@
 import '@babel/polyfill';
 import {displayMap} from './mapbox';
 import {login, logout} from './login';
+import {signup} from './signup';
 import {updateUser} from './update-user';
 import {confirmAccount} from './confirmAccount';
+import {sendRecoveryToken, resetPassword} from './resetPassword';
 
 //DOM ELEMENTS
 const mapBox = document.getElementById('map');
-const loginForm = document.querySelector('.form--login');
-const resetPassBtn = document.querySelector('#resetPassword');
-const goToSignup = document.querySelector('#goToSignup');
+const loginForm = document.querySelector('#login-form');
+const signupForm = document.querySelector('#form-signup');
+const recoveryForm = document.querySelector('#password-recovery-form');
+const resetPassForm = document.querySelector('#reset-password-form');
 const userDataForm = document.querySelector('.form-user-data');
 const passwordForm = document.querySelector('.form-user-password');
 const logoutBtn = document.querySelector('.nav__el--logout');
-const tokenField = document.querySelector('#token');
+const emailTokenField = document.querySelector('#email-confirmation-token');
+const passwordTokenField = document.querySelector('#password-reset-token');
 
 //DELEGATION
 if (mapBox) {
@@ -29,13 +33,36 @@ if (loginForm) {
 
 		login(email, password);
 	});
+}
 
-	goToSignup.addEventListener('click', e => {
-		location.assign('/signup');
-	})
+if (signupForm) {
+	signupForm.addEventListener('submit', e => {
+		e.preventDefault();
+		const name = document.getElementById('name').value;
+		const email = document.getElementById('email').value;
+		const password = document.getElementById('password').value;
+		const passwordConfirm = document.getElementById('passwordConfirm').value;
 
-	//TODO ADICIONAR FUNÇÃO DE RESETAR SENHA
-	//resetPassBtn.addEventListener('click', e => {});
+		signup(name, email, password, passwordConfirm);
+	});
+}
+
+if (recoveryForm) {
+	recoveryForm.addEventListener('submit', e => {
+		e.preventDefault();
+		sendRecoveryToken(document.getElementById('email').value);
+	});
+}
+
+if (resetPassForm) {
+	resetPassForm.addEventListener('submit', e => {
+		e.preventDefault();
+		const password = document.getElementById('password').value;
+		const passwordConfirm = document.getElementById('passwordConfirm').value;
+		const token = passwordTokenField.getAttribute('token');
+
+		resetPassword(password, passwordConfirm, token);
+	});
 }
 
 if (userDataForm) {
@@ -80,4 +107,4 @@ if (passwordForm) {
 
 if (logoutBtn) logoutBtn.addEventListener('click', logout);
 
-if (tokenField) confirmAccount(tokenField.getAttribute('token'));
+if (emailTokenField) confirmAccount(emailTokenField.getAttribute('token'));
