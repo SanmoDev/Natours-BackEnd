@@ -1,0 +1,18 @@
+extends baseEmail
+
+block content
+    p Hi #{firstName},
+        p Welcome to Natours, we're glad to have you 🎉🙏
+        p Please confirm your email in the link below so that you can get to using your new account!
+        p If you didn't sign up in the Natours website, then please ignore this email
+        table.btn.btn-primary(role='presentation', border='0', cellpadding='0', cellspacing='0')
+            tbody
+                tr
+                    td(align='left')
+                        table(role='presentation', border='0', cellpadding='0', cellspacing='0')
+                            tbody
+                                tr
+                                    td
+                                        a(href=`${url}`, target='_blank') Click here to confirm your account!
+        p If you need any help with using the Natours website or API, please don't hesitate to contact me!
+        p - Ícaro Gomes Motta, CEO
